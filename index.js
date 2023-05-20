@@ -7,9 +7,12 @@ const bot = new TelegramApi(token, { polling: true })
 
 const chats = {}
 
+const wordsLooser = ['лох', 'сосай', 'не плачь', 'пэздуй', 'фу, натурал']
+const wordsWin = ['удачливей тебя только твоя жопа', 'успешный пидор', 'сегодня тебя ждёт отсос', 'теплого тебе ануса', 'анальный дебошир']
+
 const startGame = async (chatId) => { 
-    await bot.sendMessage(chatId, `Я загадаю цифру от 0 до 9, а ты отгадай`)
-    const randomNumber = Math.floor(Math.random() * 10)
+    await bot.sendMessage(chatId, `Я загадаю цифру от 0 до 5, а ты отгадай`)
+    const randomNumber = Math.floor(Math.random() * 5)
     chats[chatId] = randomNumber
     // chats[chatId] = 8
     await bot.sendMessage(chatId, `Отгадывай`, gameOptions)
@@ -28,11 +31,11 @@ const start = () => {
 
         if (text === '/start') { 
             await bot.sendSticker(chatId, './img/12.webp')
-            return bot.sendMessage(chatId, `Соскучки!`)
+            return bot.sendMessage(chatId, `Здарова, уёба!`)
         }
         if (text === '/info') { 
             await bot.sendSticker(chatId, './img/6.webp')
-            return bot.sendMessage(chatId, `Ты ${msg.from.username}`)
+            return bot.sendMessage(chatId, `Кот все сказал`)
         }
         if (text === '/game') { 
             return startGame(chatId)
@@ -45,6 +48,10 @@ const start = () => {
     bot.on('callback_query', msg => { 
         const data = msg.data;
         const chatId = msg.message.chat.id;
+        let num = Math.floor(Math.random() * 3)
+        let numLooser = Math.floor(Math.random() * 9)
+        let wordLooserRandom = Math.floor(Math.random() * 4)
+        let wordWinRandom = Math.floor(Math.random() * 4)
 
         if (data === '/again') { 
             return startGame(chatId)
@@ -54,10 +61,11 @@ const start = () => {
         console.log('chats[chatId]', chats[chatId]);
 
         if (+data === +chats[chatId]) {
-            bot.sendSticker(chatId, `./img/win/1.webp`)
-            return bot.sendMessage(chatId, `Поздравляю, ты отгадал цифру ${chats[chatId]}`, againOptions)
+            bot.sendSticker(chatId, `./img/win/${num}.webp`)
+            return bot.sendMessage(chatId, `Поздравляю, ${wordsWin[wordWinRandom]}, ты отгадал цифру ${chats[chatId]}`, againOptions)
         } else { 
-            return bot.sendMessage(chatId, `Загаданная цифра ${chats[chatId]}`, againOptions)
+            bot.sendSticker(chatId, `./img/looser/${numLooser}.webp`)
+            return bot.sendMessage(chatId, `Загаданная цифра ${chats[chatId]}, ${wordsLooser[wordLooserRandom]}`, againOptions)
         }
     })
 }
